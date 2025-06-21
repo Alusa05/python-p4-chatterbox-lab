@@ -15,7 +15,7 @@ db.init_app(app)
 
 # GET all messages
 @app.route('/messages', methods=['GET'])
-def messages():
+def get_messages():
     messages = Message.query.order_by(Message.created_at.asc()).all()
     messages_list = [message.to_dict() for message in messages]
     return jsonify(messages_list), 200
