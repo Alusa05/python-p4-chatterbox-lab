@@ -37,9 +37,25 @@ def create_message():
         return jsonify({'error': str(e)}), 400
     
 # PATCH update a message
-@app.route('/messages/<int:id>')
-def messages_by_id(id):
-    return ''
+@app.route('/messages/<int:id>', methods=['PATCH'])
+def update_message(id):
+    message = Message.query.get_or_404(id)
+    data = request.get_json()
 
+    if "body" in data:
+        message.body = data["body"]
+        db.session.commit()
+    return jsonify(message.to_dict()), 200
+
+   # DELETE a message
+@app.route('/messages/<int:id>', methods=['DELETE'])
+def delete_message(id):
+    message = Message.query.get_or_404(id)
+    db.session.delete(message)
+    db.session.commit()
+    return jsonify({'message': 'Message deleted successfully'}), 200
+
+
+# Start the server
 if __name__ == '__main__':
     app.run(port=5555)
