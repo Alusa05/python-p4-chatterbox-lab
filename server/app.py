@@ -13,10 +13,30 @@ CORS(app)
 migrate = Migrate(app, db)
 db.init_app(app)
 
-@app.route('/messages')
+# GET all messages
+@app.route('/messages', methods=['GET'])
 def messages():
-    return ''
+    messages = Message.query.order_by(Message.created_at.asc()).all()
+    messages_list = [message.to_dict() for message in messages]
+    return jsonify(messages_list), 200
 
+
+# POST a new message
+@app.route('/messages', methods=['POST'])
+def create_message():
+    data = request.get_json()
+    try:
+        new_message = Message(
+            body= data['body'],
+            username=data['username'],
+        )
+        db.session.add(new_message)
+        db.session.commit()
+        return jsonify(new_message.to_dict()), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
+# PATCH update a message
 @app.route('/messages/<int:id>')
 def messages_by_id(id):
     return ''
